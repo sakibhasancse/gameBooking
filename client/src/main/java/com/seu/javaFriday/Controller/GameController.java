@@ -1,28 +1,21 @@
 package com.seu.javaFriday.Controller;
 
-import ch.qos.logback.core.model.Model;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.seu.javaFriday.Service.ApiService;
+import com.seu.javaFriday.dto.BookingRequestDto;
+import com.seu.javaFriday.dto.GameDto;
+import com.seu.javaFriday.dto.UserDto;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Controller
 @RequestMapping("/games")

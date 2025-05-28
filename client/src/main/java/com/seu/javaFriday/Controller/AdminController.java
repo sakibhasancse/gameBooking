@@ -1,5 +1,9 @@
 package com.seu.javaFriday.Controller;
 
+import com.seu.javaFriday.Service.ApiService;
+import com.seu.javaFriday.dto.BookingRequestDto;
+import com.seu.javaFriday.dto.GameDto;
+import com.seu.javaFriday.dto.UserDto;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

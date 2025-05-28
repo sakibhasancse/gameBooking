@@ -13,7 +13,8 @@ public class BookingRequestDto {
     private String adminNotes;
 
     // Constructors
-    public BookingRequestDto() {}
+    public BookingRequestDto() {
+    }
 
     public BookingRequestDto(UserDto user, GameDto game, LocalDateTime requestedDateTime) {
         this.user = user;
@@ -23,23 +24,59 @@ public class BookingRequestDto {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public UserDto getUser() { return user; }
-    public void setUser(UserDto user) { this.user = user; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public GameDto getGame() { return game; }
-    public void setGame(GameDto game) { this.game = game; }
+    public UserDto getUser() {
+        return user;
+    }
 
-    public LocalDateTime getRequestedDateTime() { return requestedDateTime; }
-    public void setRequestedDateTime(LocalDateTime requestedDateTime) { this.requestedDateTime = requestedDateTime; }
+    public void setUser(UserDto user) {
+        this.user = user;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public GameDto getGame() {
+        return game;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setGame(GameDto game) {
+        this.game = game;
+    }
 
-    public String getAdminNotes() { return adminNotes; }
-    public void setAdminNotes(String adminNotes) { this.adminNotes = adminNotes; }
+    public LocalDateTime getRequestedDateTime() {
+        return requestedDateTime;
+    }
+
+    public void setRequestedDateTime(LocalDateTime requestedDateTime) {
+        this.requestedDateTime = requestedDateTime;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getAdminNotes() {
+        return adminNotes;
+    }
+
+    public void setAdminNotes(String adminNotes) {
+        this.adminNotes = adminNotes;
+    }
+}

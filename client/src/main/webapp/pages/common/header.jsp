@@ -19,8 +19,29 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
     <a class="navbar-brand" href="/">Game Booking System</a>
-    <div class="navbar-nav ms-auto">
-      <c:if test="${sessionScope.isLoggedIn}">
-      <span class="navbar-text me-3">Welcome, ${sessionScope.user.username}!</span>
-      <c:if test="${sessionScope.isAdmin}">
-      <a class="nav-link" href="/admin/dashboard">Admin Dashboar
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <div class="navbar-nav ms-auto">
+        <c:choose>
+          <c:when test="${sessionScope.isLoggedIn}">
+            <span class="navbar-text me-3">Welcome, ${sessionScope.user.username}!</span>
+            <c:if test="${sessionScope.isAdmin}">
+              <a class="nav-link" href="/admin/dashboard">Admin Dashboard</a>
+            </c:if>
+            <c:if test="${not sessionScope.isAdmin}">
+              <a class="nav-link" href="/user/dashboard">Dashboard</a>
+            </c:if>
+            <a class="nav-link" href="/auth/logout">Logout</a>
+          </c:when>
+          <c:otherwise>
+            <a class="nav-link" href="/auth/login">Login</a>
+            <a class="nav-link" href="/auth/register">Register</a>
+          </c:otherwise>
+        </c:choose>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="container mt-4">

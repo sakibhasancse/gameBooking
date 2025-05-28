@@ -16,9 +16,4 @@ public class Response {
     private String msg;
     private String test;
     private Object data;
-    private List<Course> courses;
-
-    public void setCourses(List<Course> courses) {
-        this.courses = courses;
-    }
 }

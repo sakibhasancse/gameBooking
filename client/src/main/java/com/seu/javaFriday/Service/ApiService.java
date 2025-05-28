@@ -1,12 +1,17 @@
 package com.seu.javaFriday.Service;
 
+import com.seu.javaFriday.dto.BookingRequestDto;
+import com.seu.javaFriday.dto.GameDto;
+import com.seu.javaFriday.dto.LoginRequest;
+import com.seu.javaFriday.dto.UserDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class ApiService {
@@ -211,4 +216,96 @@ public class ApiService {
             return null;
         }
     }
+
+    public ResponseEntity<String> requestSlot(Long gameId, LocalDateTime requestedDateTime) {
+        try {
+            String url = backendUrl + "/api/bookings/request";
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("gameId", gameId);
+            requestBody.put("requestedDateTime", requestedDateTime.toString());
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody);
+
+            return restTemplate.postForEntity(url, entity, String.class);
+        } catch (HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error requesting slot: " + e.getMessage());
+        }
+    }
+
+
+
+    public List<BookingRequestDto> getUserBookings() {
+        try {
+            String url = backendUrl + "/api/bookings/user";
+
+            ResponseEntity<BookingRequestDto[]> response = restTemplate.getForEntity(
+                    url, BookingRequestDto[].class);
+
+            return Arrays.asList(response.getBody());
+        } catch (HttpClientErrorException e) {
+            System.err.println("Error fetching user bookings: " + e.getMessage());
+            return new ArrayList<>();
+        } catch (Exception e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+
+    public ResponseEntity<String> cancelBooking(Long bookingId) {
+        try {
+            String url = backendUrl + "/api/bookings/" + bookingId + "/cancel";
+
+            return restTemplate.exchange(url, HttpMethod.PUT, null, String.class);
+        } catch (HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error canceling booking: " + e.getMessage());
+        }
+    }
+
+
+    public List<BookingRequestDto> getAllBookings() {
+        try {
+            String url = backendUrl + "/api/admin/bookings";
+
+            ResponseEntity<BookingRequestDto[]> response = restTemplate.getForEntity(
+                    url, BookingRequestDto[].class);
+
+            return Arrays.asList(response.getBody());
+        } catch (HttpClientErrorException e) {
+            System.err.println("Error fetching all bookings: " + e.getMessage());
+            return new ArrayList<>();
+        } catch (Exception e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+
+    public ResponseEntity<String> updateBookingStatus(Long bookingId, String status, String adminNotes) {
+        try {
+            String url = backendUrl + "/api/admin/bookings/" + bookingId + "/status";
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("status", status);
+            requestBody.put("adminNotes", adminNotes);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody);
+
+            return restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
+        } catch (HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error updating booking status: " + e.getMessage());
+        }
+    }
+
 }
+

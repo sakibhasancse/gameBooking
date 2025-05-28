@@ -1,6 +1,8 @@
 package com.seu.javaFriday.Model;
 
 
+import java.time.LocalDateTime;
+
 public class Booking {
     private Long id;
     private Long gameId;

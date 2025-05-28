@@ -1,18 +1,23 @@
 package com.seu.javaFriday.Controller;
 
-import ch.qos.logback.core.model.Model;
+import com.seu.javaFriday.dto.BookingRequestDto;
+import com.seu.javaFriday.dto.GameDto;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import com.seu.javaFriday.Model.Booking;
+import com.seu.javaFriday.Model.Game;
+import com.seu.javaFriday.Service.ApiService;
+import com.seu.javaFriday.Service.SessionService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.List;
+
 
 @Controller
 @RequestMapping("/user")
@@ -27,12 +32,12 @@ public class UserController {
     @GetMapping("/dashboard")
     public String userDashboard(HttpSession session, Model model) {
         if (!sessionService.isAuthenticated(session) || !sessionService.isUser(session)) {
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
 
         String token = sessionService.getToken(session);
-        List<Game> activeGames = apiService.getAllActiveGames();
-        List<Booking> userBookings = apiService.getUserBookings(token);
+        List<GameDto> activeGames = apiService.getAllActiveGames();
+        List<BookingRequestDto> userBookings = apiService.getUserBookings();
 
         model.addAttribute("username", sessionService.getUsername(session));
         model.addAttribute("games", activeGames);
@@ -44,10 +49,10 @@ public class UserController {
     @GetMapping("/games")
     public String viewGames(HttpSession session, Model model) {
         if (!sessionService.isAuthenticated(session) || !sessionService.isUser(session)) {
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
 
-        List<Game> activeGames = apiService.getAllActiveGames();
+        List<GameDto> activeGames = apiService.getAllActiveGames();
         model.addAttribute("games", activeGames);
         model.addAttribute("username", sessionService.getUsername(session));
 
@@ -57,10 +62,10 @@ public class UserController {
     @GetMapping("/games/{id}")
     public String viewGameDetails(@PathVariable Long id, HttpSession session, Model model) {
         if (!sessionService.isAuthenticated(session) || !sessionService.isUser(session)) {
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
 
-        Game game = apiService.getGameById(id);
+        GameDto game = apiService.getGameById(id);
         if (game == null) {
             return "redirect:/user/games";
         }
@@ -74,13 +79,14 @@ public class UserController {
     @PostMapping("/games/{gameId}/request-slot")
     public String requestSlot(@PathVariable Long gameId,
                               HttpSession session,
-                              RedirectAttributes redirectAttributes) {
+                              RedirectAttributes redirectAttributes,
+                              @RequestParam("requestedDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime requestedDateTime) {
         if (!sessionService.isAuthenticated(session) || !sessionService.isUser(session)) {
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
 
-        String token = sessionService.getToken(session);
-        Booking booking = apiService.requestSlot(gameId, token);
+//        String token = sessionService.getToken(session);
+        ResponseEntity<String> booking = apiService.requestSlot(gameId,  requestedDateTime);
 
         if (booking != null) {
             redirectAttributes.addFlashAttribute("success", "Slot requested successfully!");
@@ -94,11 +100,11 @@ public class UserController {
     @GetMapping("/bookings")
     public String viewBookings(HttpSession session, Model model) {
         if (!sessionService.isAuthenticated(session) || !sessionService.isUser(session)) {
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
 
         String token = sessionService.getToken(session);
-        List<Booking> bookings = apiService.getUserBookings(token);
+        List<BookingRequestDto> bookings = apiService.getUserBookings();
 
         model.addAttribute("bookings", bookings);
         model.addAttribute("username", sessionService.getUsername(session));
@@ -111,11 +117,11 @@ public class UserController {
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
         if (!sessionService.isAuthenticated(session) || !sessionService.isUser(session)) {
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
 
-        String token = sessionService.getToken(session);
-        boolean success = apiService.cancelBooking(bookingId, token);
+//        String token = sessionService.getToken(session);
+        boolean success = apiService.cancelBooking(bookingId).hasBody();
 
         if (success) {
             redirectAttributes.addFlashAttribute("success", "Booking cancelled successfully!");

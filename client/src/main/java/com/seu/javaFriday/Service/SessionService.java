@@ -1,5 +1,8 @@
 package com.seu.javaFriday.Service;
 
+import jakarta.servlet.http.HttpSession;
+import org.springframework.stereotype.Service;
+
 @Service
 public class SessionService {
 
