@@ -7,6 +7,9 @@ import com.seu.javaFriday.dto.GameDto;
 import com.seu.javaFriday.dto.UserDto;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,11 +29,19 @@ public class GameController {
 
     @GetMapping
     public String gamesList(Model model, HttpSession session) {
+        System.out.println("Caling for game list");
+
+        System.out.println("User ====>" +session.getAttribute("user"));
+
         List<GameDto> games = apiService.getAllActiveGames();
         model.addAttribute("games", games);
 
-        UserDto user = (UserDto) session.getAttribute("user");
-        if (user != null) {
+        System.out.println("Game list ====>" + games);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Current user====> " + auth.getName());
+        if (auth.isAuthenticated() &&  !auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))) {
+            String username = auth.getName();
+            UserDto user = apiService.getUserByUsername(username);
             List<BookingRequestDto> userBookings = apiService.getBookingRequestsByUser(user.getId());
             model.addAttribute("userBookings", userBookings);
         }
@@ -55,8 +66,9 @@ public class GameController {
         if (user == null) {
             return "redirect:/auth/login";
         }
-
+    System.out.println("book ====>" + id);
         GameDto game = apiService.getGameById(id);
+        System.out.println("book game====>" + game);
         if (game == null) {
             redirectAttributes.addFlashAttribute("error", "Game not found");
             return "redirect:/games";

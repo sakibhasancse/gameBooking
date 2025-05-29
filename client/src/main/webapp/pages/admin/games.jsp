@@ -52,7 +52,7 @@
                                 ${game.isActive ? 'Active' : 'Inactive'}
                         </span>
                 </td>
-                <td><fmt:formatDate value="${game.createdAt}" pattern="yyyy-MM-dd HH:mm" /></td>
+                <td><fmt:formatDate value="${game.createdAtDate}" pattern="yyyy-MM-dd HH:mm" /></td>
                 <td>
                     <a href="/admin/games/edit/${game.id}" class="btn btn-sm btn-warning">Edit</a>
                     <form action="/admin/games/delete/${game.id}" method="post" style="display: inline-block;"

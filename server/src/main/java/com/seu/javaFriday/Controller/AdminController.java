@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
@@ -42,6 +42,8 @@ public class AdminController {
 
     @PostMapping("/games")
     public ResponseEntity<Game> createGame(@Valid @RequestBody GameRequest gameRequest) {
+        System.out.println("gameRequest: " + gameRequest);
+
         Game game = new Game(gameRequest.getGameName(),
                 gameRequest.getDescription(),
                 gameRequest.getMaxPlayers(),
@@ -51,6 +53,7 @@ public class AdminController {
 
     @PutMapping("/games/{id}")
     public ResponseEntity<Game> updateGame(@PathVariable Long id, @Valid @RequestBody GameRequest gameRequest) {
+        System.out.println("id: =====>> " + id);
         Game gameDetails = new Game(gameRequest.getGameName(),
                 gameRequest.getDescription(),
                 gameRequest.getMaxPlayers(),
@@ -97,15 +100,17 @@ public class AdminController {
         return ResponseEntity.ok(bookingService.getBookingRequestsByStatus(BookingStatus.PENDING));
     }
 
-    @PutMapping("/bookings/{id}/approve")
+    @PutMapping("/bookings/{id}/APPROVED")
     public ResponseEntity<BookingRequestDTO> approveBooking(@PathVariable Long id,
                                                             @RequestBody(required = false) String adminNotes) {
+        System.out.println("adminNotes: " + adminNotes);
         return ResponseEntity.ok(bookingService.updateBookingStatus(id, BookingStatus.APPROVED, adminNotes));
     }
 
-    @PutMapping("/bookings/{id}/reject")
+    @PutMapping("/bookings/{id}/REJECTED")
     public ResponseEntity<BookingRequestDTO> rejectBooking(@PathVariable Long id,
                                                            @RequestBody(required = false) String adminNotes) {
+        System.out.println(adminNotes);
         return ResponseEntity.ok(bookingService.updateBookingStatus(id, BookingStatus.REJECTED, adminNotes));
     }
 

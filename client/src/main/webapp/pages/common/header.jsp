@@ -24,13 +24,14 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <div class="navbar-nav ms-auto">
+
         <c:choose>
-          <c:when test="${sessionScope.isLoggedIn}">
-            <span class="navbar-text me-3">Welcome, ${sessionScope.user.username}!</span>
-            <c:if test="${sessionScope.isAdmin}">
+          <c:when test="${isLoggedIn}">
+            <span class="navbar-text me-3">Welcome, ${username}!</span>
+            <c:if test="${isAdmin}">
               <a class="nav-link" href="/admin/dashboard">Admin Dashboard</a>
             </c:if>
-            <c:if test="${not sessionScope.isAdmin}">
+            <c:if test="${not isAdmin}">
               <a class="nav-link" href="/user/dashboard">Dashboard</a>
             </c:if>
             <a class="nav-link" href="/auth/logout">Logout</a>
@@ -40,8 +41,10 @@
             <a class="nav-link" href="/auth/register">Register</a>
           </c:otherwise>
         </c:choose>
+
       </div>
     </div>
   </div>
 </nav>
+
 <div class="container mt-4">

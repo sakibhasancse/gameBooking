@@ -5,8 +5,6 @@
   Time: 10:18 PM
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<!-- src/main/webapp/WEB-INF/jsp/admin/bookings.jsp -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -42,7 +40,7 @@
             <td>${booking.id}</td>
             <td>${booking.user.username}</td>
             <td>${booking.game.gameName}</td>
-            <td><fmt:formatDate value="${booking.requestedDateTime}" pattern="yyyy-MM-dd HH:mm" /></td>
+            <td><fmt:formatDate value="${booking.requestedDate}" pattern="yyyy-MM-dd HH:mm" /></td>
             <td>
                         <span class="badge
                             <c:choose>
@@ -52,7 +50,7 @@
                             </c:choose>
                         ">${booking.status}</span>
             </td>
-            <td><fmt:formatDate value="${booking.createdAt}" pattern="yyyy-MM-dd HH:mm" /></td>
+            <td><fmt:formatDate value="${booking.requestedDate}" pattern="yyyy-MM-dd HH:mm" /></td>
             <td>${booking.adminNotes}</td>
             <td>
                 <c:if test='${booking.status == "PENDING"}'>
@@ -108,3 +106,18 @@
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                     <button type="submit" class="btn btn-danger">Reject</button>
                                 </div>
+
+                        </form>
+                    </div> <!-- modal-content -->
+                </div> <!-- modal-dialog -->
+                    </div> <!-- rejectModal -->
+
+                </c:if>
+            </td>
+            </tr>
+        </c:forEach>
+</tbody>
+</table>
+</div>
+
+                    <jsp:include page="../common/footer.jsp" />

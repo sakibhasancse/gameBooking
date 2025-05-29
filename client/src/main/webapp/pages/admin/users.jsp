@@ -43,7 +43,7 @@
                             ${user.role}
                         </span>
         </td>
-        <td><fmt:formatDate value="${user.createdAt}" pattern="yyyy-MM-dd HH:mm" /></td>
+        <td><fmt:formatDate value="${user.createdAtDate}" pattern="yyyy-MM-dd HH:mm" /></td>
         <td>
           <c:if test="${user.role != 'ADMIN'}">
             <form action="/admin/users/delete/${user.id}" method="post" style="display: inline-block;"

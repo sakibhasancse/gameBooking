@@ -21,13 +21,14 @@ public class ApiService {
 
     private final RestTemplate restTemplate;
 
-    public ApiService() {
-        this.restTemplate = new RestTemplate();
+    public ApiService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
     // Authentication Methods
     public UserDto login(LoginRequest loginRequest) {
         try {
+            System.out.println("Login Req" + loginRequest);
             ResponseEntity<UserDto> response = restTemplate.postForEntity(
                     backendUrl + "/auth/login",
                     loginRequest,
@@ -35,6 +36,7 @@ public class ApiService {
             );
             return response.getBody();
         } catch (Exception e) {
+            System.out.println("Login Error" + e);
             return null;
         }
     }
@@ -48,6 +50,21 @@ public class ApiService {
             );
             return response.getBody();
         } catch (Exception e) {
+            System.out.println("Error registering user: " + e.getMessage());
+            return null;
+        }
+    }
+
+
+    public UserDto getUserByUsername(String username) {
+        try {
+            ResponseEntity<UserDto> response = restTemplate.getForEntity(
+                    backendUrl + "/auth/" + username,
+                    UserDto.class
+            );
+            return response.getBody();
+        } catch (Exception e) {
+            System.out.println("Error getUserByUsername: " + e.getMessage());
             return null;
         }
     }
@@ -61,6 +78,7 @@ public class ApiService {
             );
             return Arrays.asList(response.getBody());
         } catch (Exception e) {
+            System.out.println("Error getAllActiveGames: " + e.getMessage());
             return Arrays.asList();
         }
     }
@@ -68,7 +86,7 @@ public class ApiService {
     public List<GameDto> getAllGames() {
         try {
             ResponseEntity<GameDto[]> response = restTemplate.getForEntity(
-                    backendUrl + "/games",
+                    backendUrl + "/admin/games",
                     GameDto[].class
             );
             return Arrays.asList(response.getBody());
@@ -79,12 +97,15 @@ public class ApiService {
 
     public GameDto getGameById(Long id) {
         try {
+            System.out.println("getGameById" + id);
+
             ResponseEntity<GameDto> response = restTemplate.getForEntity(
                     backendUrl + "/games/" + id,
                     GameDto.class
             );
             return response.getBody();
         } catch (Exception e) {
+            System.out.println("Error getting game: " + e.getMessage());
             return null;
         }
     }
@@ -92,12 +113,13 @@ public class ApiService {
     public GameDto createGame(GameDto gameDto) {
         try {
             ResponseEntity<GameDto> response = restTemplate.postForEntity(
-                    backendUrl + "/games",
+                    backendUrl + "/admin/games",
                     gameDto,
                     GameDto.class
             );
             return response.getBody();
         } catch (Exception e) {
+            System.out.println("Error creating game: " + e.getMessage());
             return null;
         }
     }
@@ -106,7 +128,7 @@ public class ApiService {
         try {
             HttpEntity<GameDto> request = new HttpEntity<>(gameDto);
             ResponseEntity<GameDto> response = restTemplate.exchange(
-                    backendUrl + "/games/" + id,
+                    backendUrl + "/admin/games/" + id,
                     HttpMethod.PUT,
                     request,
                     GameDto.class
@@ -119,7 +141,7 @@ public class ApiService {
 
     public boolean deleteGame(Long id) {
         try {
-            restTemplate.delete(backendUrl + "/games/" + id);
+            restTemplate.delete(backendUrl + "/admin/games/" + id);
             return true;
         } catch (Exception e) {
             return false;
@@ -130,7 +152,7 @@ public class ApiService {
     public List<UserDto> getAllUsers() {
         try {
             ResponseEntity<UserDto[]> response = restTemplate.getForEntity(
-                    backendUrl + "/users",
+                    backendUrl + "/admin/users",
                     UserDto[].class
             );
             return Arrays.asList(response.getBody());
@@ -142,7 +164,7 @@ public class ApiService {
     public UserDto getUserById(Long id) {
         try {
             ResponseEntity<UserDto> response = restTemplate.getForEntity(
-                    backendUrl + "/users/" + id,
+                    backendUrl + "/admin/users/" + id,
                     UserDto.class
             );
             return response.getBody();
@@ -153,7 +175,7 @@ public class ApiService {
 
     public boolean deleteUser(Long id) {
         try {
-            restTemplate.delete(backendUrl + "/users/" + id);
+            restTemplate.delete(backendUrl + "/admin/users/" + id);
             return true;
         } catch (Exception e) {
             return false;
@@ -177,7 +199,7 @@ public class ApiService {
     public List<BookingRequestDto> getAllBookingRequests() {
         try {
             ResponseEntity<BookingRequestDto[]> response = restTemplate.getForEntity(
-                    backendUrl + "/booking-requests",
+                    backendUrl + "/admin/bookings",
                     BookingRequestDto[].class
             );
             return Arrays.asList(response.getBody());
@@ -201,25 +223,26 @@ public class ApiService {
     public BookingRequestDto updateBookingRequestStatus(Long id, String status, String adminNotes) {
         try {
             BookingRequestDto request = new BookingRequestDto();
-            request.setStatus(status);
+//            request.setStatus(status);
             request.setAdminNotes(adminNotes);
 
             HttpEntity<BookingRequestDto> httpEntity = new HttpEntity<>(request);
             ResponseEntity<BookingRequestDto> response = restTemplate.exchange(
-                    backendUrl + "/booking-requests/" + id + "/status",
+                    backendUrl + "/admin/bookings/" + id + "/" + status,
                     HttpMethod.PUT,
                     httpEntity,
                     BookingRequestDto.class
             );
             return response.getBody();
         } catch (Exception e) {
+            System.out.println("Error getting booking request: " + e.getMessage());
             return null;
         }
     }
 
     public ResponseEntity<String> requestSlot(Long gameId, LocalDateTime requestedDateTime) {
         try {
-            String url = backendUrl + "/api/bookings/request";
+            String url = backendUrl + "/user/bookings";
 
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("gameId", gameId);
@@ -240,10 +263,14 @@ public class ApiService {
 
     public List<BookingRequestDto> getUserBookings() {
         try {
-            String url = backendUrl + "/api/bookings/user";
 
-            ResponseEntity<BookingRequestDto[]> response = restTemplate.getForEntity(
-                    url, BookingRequestDto[].class);
+            String url = backendUrl + "/user/bookings";
+            ResponseEntity<BookingRequestDto[]> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    null,
+                    BookingRequestDto[].class
+            );
 
             return Arrays.asList(response.getBody());
         } catch (HttpClientErrorException e) {
@@ -258,7 +285,7 @@ public class ApiService {
 
     public ResponseEntity<String> cancelBooking(Long bookingId) {
         try {
-            String url = backendUrl + "/api/bookings/" + bookingId + "/cancel";
+            String url = backendUrl + "/bookings/" + bookingId + "/cancel";
 
             return restTemplate.exchange(url, HttpMethod.PUT, null, String.class);
         } catch (HttpClientErrorException e) {
@@ -272,7 +299,7 @@ public class ApiService {
 
     public List<BookingRequestDto> getAllBookings() {
         try {
-            String url = backendUrl + "/api/admin/bookings";
+            String url = backendUrl + "/admin/bookings";
 
             ResponseEntity<BookingRequestDto[]> response = restTemplate.getForEntity(
                     url, BookingRequestDto[].class);
@@ -290,7 +317,7 @@ public class ApiService {
 
     public ResponseEntity<String> updateBookingStatus(Long bookingId, String status, String adminNotes) {
         try {
-            String url = backendUrl + "/api/admin/bookings/" + bookingId + "/status";
+            String url = backendUrl + "/admin/bookings/" + bookingId + "/status";
 
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("status", status);

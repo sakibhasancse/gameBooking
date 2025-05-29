@@ -35,7 +35,7 @@
             </small>
           </p>
 
-          <c:if test="${sessionScope.isLoggedIn and !sessionScope.isAdmin}">
+          <c:if test="${isLoggedIn and !isAdmin}">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookModal${game.id}">
               Book Now
             </button>
@@ -48,7 +48,7 @@
                     <h5 class="modal-title">Book ${game.gameName}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                   </div>
-                  <form action="/games/${game.id}/book" method="post">
+                  <form action="/user/games/${game.id}/request-slot" method="post">
                     <div class="modal-body">
                       <div class="mb-3">
                         <label for="requestedDateTime${game.id}" class="form-label">Preferred Date & Time</label>
@@ -65,7 +65,7 @@
             </div>
           </c:if>
 
-          <c:if test="${!sessionScope.isLoggedIn}">
+          <c:if test="${!isLoggedIn}">
             <a href="/auth/login" class="btn btn-primary">Login to Book</a>
           </c:if>
         </div>
@@ -74,7 +74,7 @@
   </c:forEach>
 </div>
 
-<c:if test="${sessionScope.isLoggedIn and !sessionScope.isAdmin and not empty userBookings}">
+<c:if test="${isLoggedIn and !isAdmin and not empty userBookings}">
   <h3 class="mt-5">Your Booking Requests</h3>
   <div class="table-responsive">
     <table class="table table-striped">

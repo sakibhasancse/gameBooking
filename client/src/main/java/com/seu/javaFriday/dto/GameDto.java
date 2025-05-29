@@ -2,6 +2,8 @@ package com.seu.javaFriday.dto;
 
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 public class GameDto {
@@ -49,4 +51,11 @@ public class GameDto {
 
     public List<BookingRequestDto> getBookingRequests() { return bookingRequests; }
     public void setBookingRequests(List<BookingRequestDto> bookingRequests) { this.bookingRequests = bookingRequests; }
+
+    public Date getCreatedAtDate() {
+        if (createdAt == null) {
+            return null;  // avoid NPE
+        }
+        return Date.from(createdAt.atZone(ZoneId.systemDefault()).toInstant());
+    }
 }

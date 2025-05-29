@@ -8,6 +8,7 @@ import com.seu.javaFriday.Dto.RegisterRequest;
 import com.seu.javaFriday.Entities.Role;
 import com.seu.javaFriday.Entities.User;
 import com.seu.javaFriday.Repo.UserRepo;
+import com.seu.javaFriday.Service.UserService;
 import com.seu.javaFriday.Utility.JwtUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-//@CrossOrigin(origins = "*", maxAge = 3600)
+import java.util.Optional;
+
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -35,22 +38,32 @@ public class AuthController {
 
     @Autowired
     JwtUtils jwtUtils;
+    @Autowired
+    private UserService userService;
 
-    @PostMapping("/signin")
+    @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        System.out.println("loginRequest: " + loginRequest);
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
 
         User user = userRepository.findByUsername(loginRequest.getUsername()).orElse(null);
+        String role = user.getRole().toString();
+        if (role == "ADMIN") role = "ROLE_ADMIN";
+        else if (role == "USER") role = "ROLE_USER";
+        String jwt = jwtUtils.generateJwtToken(authentication,  role);
 
         return ResponseEntity.ok(new JwtResponse(jwt, user.getId(), user.getUsername(), user.getEmail(), user.getRole()));
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest signUpRequest) {
+        System.out.println("Call");
+        System.out.println(encoder.encode(signUpRequest.getUsername()));
+
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity.badRequest()
                     .body(new MessageResponse("Error: Username is already taken!"));
@@ -71,7 +84,7 @@ public class AuthController {
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
-    @PostMapping("/admin/signin")
+    @PostMapping("/admin/login")
     public ResponseEntity<?> authenticateAdmin(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -84,8 +97,20 @@ public class AuthController {
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication, "ROLE_ADMIN");
 
         return ResponseEntity.ok(new JwtResponse(jwt, user.getId(), user.getUsername(), user.getEmail(), user.getRole()));
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
+        System.out.println("username: " + username);
+        Optional<User> userDto = userService.getUserByUsername(username);
+        System.out.println("userDto: " + userDto);
+
+        if (userDto.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(userDto);
     }
 }

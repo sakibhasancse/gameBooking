@@ -1,11 +1,16 @@
 package com.seu.javaFriday.Controller;
 
 import com.seu.javaFriday.Service.ApiService;
+import com.seu.javaFriday.Service.TokenService;
 import com.seu.javaFriday.dto.BookingRequestDto;
 import com.seu.javaFriday.dto.GameDto;
 import com.seu.javaFriday.dto.UserDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +25,13 @@ public class AdminController {
     @Autowired
     private ApiService apiService;
 
+    @Autowired
+    private TokenService tokenService;
+
+
     @GetMapping("/dashboard")
-    public String dashboard(Model model, HttpSession session) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null || !isAdmin) {
+    public String dashboard(HttpServletRequest request,  Model model, HttpSession session) {
+        if (!tokenService.isAuthenticated(request) || !tokenService.isAdmin(request)) {
             return "redirect:/games";
         }
 
@@ -40,9 +48,8 @@ public class AdminController {
 
     // Game Management
     @GetMapping("/games")
-    public String manageGames(Model model, HttpSession session) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null || !isAdmin) {
+    public String manageGames(HttpServletRequest request,  Model model, HttpSession session) {
+        if (!tokenService.isAuthenticated(request) || !tokenService.isAdmin(request)) {
             return "redirect:/games";
         }
 
@@ -52,20 +59,18 @@ public class AdminController {
     }
 
     @GetMapping("/games/add")
-    public String addGameForm(HttpSession session) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null || !isAdmin) {
+    public String addGameForm(HttpServletRequest request,  Model model, HttpSession session) {
+        if (!tokenService.isAuthenticated(request) || !tokenService.isAdmin(request)) {
             return "redirect:/games";
         }
+
         return "admin/add-game";
     }
 
     @PostMapping("/games/add")
     public String addGame(@ModelAttribute GameDto gameDto,
-                          RedirectAttributes redirectAttributes,
-                          HttpSession session) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null || !isAdmin) {
+                          RedirectAttributes redirectAttributes,HttpServletRequest request,  Model model, HttpSession session) {
+        if (!tokenService.isAuthenticated(request) || !tokenService.isAdmin(request)) {
             return "redirect:/games";
         }
 
@@ -79,9 +84,8 @@ public class AdminController {
     }
 
     @GetMapping("/games/edit/{id}")
-    public String editGameForm(@PathVariable Long id, Model model, HttpSession session) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null || !isAdmin) {
+    public String editGameForm(@PathVariable Long id, Model model, HttpSession session, HttpServletRequest request) {
+        if (!tokenService.isAuthenticated(request) || !tokenService.isAdmin(request)) {
             return "redirect:/games";
         }
 
@@ -94,9 +98,8 @@ public class AdminController {
     public String editGame(@PathVariable Long id,
                            @ModelAttribute GameDto gameDto,
                            RedirectAttributes redirectAttributes,
-                           HttpSession session) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null || !isAdmin) {
+                          HttpServletRequest request,  Model model, HttpSession session) {
+        if (!tokenService.isAuthenticated(request) || !tokenService.isAdmin(request)) {
             return "redirect:/games";
         }
 
@@ -111,12 +114,11 @@ public class AdminController {
 
     @PostMapping("/games/delete/{id}")
     public String deleteGame(@PathVariable Long id,
-                             RedirectAttributes redirectAttributes,
-                             HttpSession session) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null || !isAdmin) {
+                             RedirectAttributes redirectAttributes,HttpServletRequest request,  Model model, HttpSession session) {
+        if (!tokenService.isAuthenticated(request) || !tokenService.isAdmin(request)) {
             return "redirect:/games";
         }
+
 
         boolean result = apiService.deleteGame(id);
         if (result) {
@@ -129,9 +131,8 @@ public class AdminController {
 
     // User Management
     @GetMapping("/users")
-    public String manageUsers(Model model, HttpSession session) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null || !isAdmin) {
+    public String manageUsers(HttpServletRequest request,  Model model, HttpSession session) {
+        if (!tokenService.isAuthenticated(request) || !tokenService.isAdmin(request)) {
             return "redirect:/games";
         }
 
@@ -143,9 +144,8 @@ public class AdminController {
     @PostMapping("/users/delete/{id}")
     public String deleteUser(@PathVariable Long id,
                              RedirectAttributes redirectAttributes,
-                             HttpSession session) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null || !isAdmin) {
+                             HttpServletRequest request,  Model model, HttpSession session) {
+        if (!tokenService.isAuthenticated(request) || !tokenService.isAdmin(request)) {
             return "redirect:/games";
         }
 
@@ -160,11 +160,11 @@ public class AdminController {
 
     // Booking Management
     @GetMapping("/bookings")
-    public String manageBookings(Model model, HttpSession session) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null || !isAdmin) {
+    public String manageBookings(HttpServletRequest request,  Model model, HttpSession session) {
+        if (!tokenService.isAuthenticated(request) || !tokenService.isAdmin(request)) {
             return "redirect:/games";
         }
+
 
         List<BookingRequestDto> bookingRequests = apiService.getAllBookingRequests();
         model.addAttribute("bookingRequests", bookingRequests);
@@ -176,11 +176,11 @@ public class AdminController {
                                       @RequestParam String status,
                                       @RequestParam(required = false) String adminNotes,
                                       RedirectAttributes redirectAttributes,
-                                      HttpSession session) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null || !isAdmin) {
+                                     HttpServletRequest request,  Model model, HttpSession session) {
+        if (!tokenService.isAuthenticated(request) || !tokenService.isAdmin(request)) {
             return "redirect:/games";
         }
+
 
         BookingRequestDto result = apiService.updateBookingRequestStatus(id, status, adminNotes);
         if (result != null) {

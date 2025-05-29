@@ -2,6 +2,8 @@ package com.seu.javaFriday.Model;
 
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 public class Booking {
     private Long id;
@@ -43,5 +45,7 @@ public class Booking {
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+
+
 }
 

@@ -2,6 +2,8 @@ package com.seu.javaFriday.dto;
 
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 public class BookingRequestDto {
     private Long id;
@@ -78,5 +80,11 @@ public class BookingRequestDto {
 
     public void setAdminNotes(String adminNotes) {
         this.adminNotes = adminNotes;
+    }
+    public Date getRequestedDate() {
+        if (requestedDateTime == null) {
+            return null;  // avoid NPE
+        }
+        return Date.from(requestedDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 }
